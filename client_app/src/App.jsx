@@ -1,14 +1,19 @@
 import { useState } from 'react'
-// import Navbar from './components/navbar'
-import StoreForm from './components/storeForm'
+import './styles/index.css';
+import Navbar from './components/navbar'
+import StoreForm from './components/StoreForm'
+import ShapesList from './components/ShapesList';
 
 
 function App() {
 
   return (
     <>
-      {/* <Navbar /> */}
-      <StoreForm />
+      <Navbar />
+      <div className="main-container">
+        <StoreForm />
+        <ShapesList />
+      </div>
     </>
   )
 }
