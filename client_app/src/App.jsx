@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './styles/index.css';
-import Navbar from './components/navbar'
-import StoreForm from './components/StoreForm'
+import Navbar from './components/navbar';
+import StoreForm from './components/storeForm';
 import ShapesList from './components/ShapesList';
 
 

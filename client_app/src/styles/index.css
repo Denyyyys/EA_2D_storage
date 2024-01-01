@@ -237,6 +237,24 @@ Main Container Styles
 .main-container{
   display: flex;
   margin: 0px var(--sides-margin);
+  max-width: var(--max-width);
+}
+@media screen and (min-width: 1200px) {
+  .main-container {
+    margin: 0 auto;
+  }
+}
+@media screen and (max-width: 680px) {
+  .main-container {
+    display: block;
+  }
+
+  .main-inner-container{
+    width: 100%;
+    margin-left: auto;
+    margin-right: auto;
+    margin-bottom: 10px;
+  }
 }
 
 .main-inner-container{
