@@ -5,7 +5,7 @@ import { addProduct } from '../slices/productsSlice'
 import { isRectangle, getRectangleSize, createEmptyArray } from '../utils/utils'
 import { useState } from 'react';
 import { toast } from 'react-toastify';
-
+import React, { useRef, useEffect } from 'react';
 
 function StoreForm() {
 	const dispatch = useDispatch();
@@ -53,17 +53,22 @@ function StoreForm() {
 		if (isRectangle(currentProduct)) {
 			const { width, height } = getRectangleSize(currentProduct);
 			dispatch(addProduct({ width, height }))
-			// const cellsDOM = document.querySelectorAll('store-grid');
-			// console.log(1111111111111111111111111);
+			const cellsDOM = document.querySelectorAll('.store-cell');
+			console.log(1111111111111111111111111);
 			// for (let i = 0; i < cellsDOM.length; i++) {
 			// 	const item = cellsDOM[i];
+			// 	console.log(item.dataset);
 			// 	item.dataset.clicked = "false"
-			// 	item.dataset.style.backgroundColor = '#f1f5f8';
+			// 	item.style.backgroundColor = '#f1f5f8';
 			// }
-			toast.success('Success!', { position: toast.POSITION.TOP_CENTER, autoClose: 3000, closeOnClick: true });
+			cellsDOM.forEach(div => {
+				div.setAttribute('data-clicked', 'false');
+				div.style.backgroundColor = '#f1f5f8';
+			})
+			toast.success('Product added successfully!', { position: toast.POSITION.TOP_CENTER, autoClose: 3000, closeOnClick: true });
 		}
 		else {
-			toast.error('Error', { position: toast.POSITION.TOP_CENTER, autoClose: 3000, closeOnClick: true })
+			toast.error('Selected Product is not a rectangle!', { position: toast.POSITION.TOP_CENTER, autoClose: 3000, closeOnClick: true })
 		}
 	}
 	const paragraphs = Array.from({ length: storeHeight * storeWidth }, (_, index) => {
@@ -111,6 +116,5 @@ function StoreForm() {
 			<button disabled={isButtonDisabled} className="submit-product-btn btn btn-success" onClick={submitProductHandler} >Submit Product</button>
 		</form>
 	)
-
 }
 export default StoreForm;
