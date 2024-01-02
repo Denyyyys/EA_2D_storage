@@ -75,3 +75,20 @@ export function getRectangleSize(array) {
 	height = size / width;
 	return {width, height}
 }
+
+export function createEmptyArray(storeWidth, storeHeight) {
+  // Initialize an empty 2D array
+  const newArray = [];
+
+  // Loop to create rows
+  for (let i = 0; i < storeHeight; i++) {
+    // Initialize each row with zeros
+    const row = Array(storeWidth).fill(0);
+    newArray.push(row);
+  }
+
+  return newArray;
+}
+
+
+

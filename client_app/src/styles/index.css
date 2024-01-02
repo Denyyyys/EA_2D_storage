@@ -112,6 +112,7 @@ Variables
   --light-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
   --dark-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   --max-width: 1170px;
+  --max-height: 900px;
   --fixed-width: 620px;
   --sides-margin: 30px;
 }
@@ -262,7 +263,10 @@ Main Container Styles
   width: 50%;
   padding: 20px;
   box-sizing: border-box;
-  border: 1px solid #ccc; /* Optional: Add border for visual separation */
+  border: 1px solid #ccc; /* Optional: Add border for visual 
+  separation */
+  overflow: scroll;
+  max-height: var(--max-height);
 }
 
 .store-size-container{
@@ -297,9 +301,51 @@ Main Container Styles
 
 .store-cell{
   width: 100%;
-  outline: 2px solid #222;
+  border: 2px solid #222;
   aspect-ratio: 1 / 1;
 }
 .store-cell:hover{
   cursor: pointer;
+}
+
+/*
+=============== 
+Store Form Styles
+===============
+*/
+
+.new-product-title{
+  text-align: center;
+  margin: 20px;
+  font-size: larger;
+}
+
+.submit-product-btn{
+  display: block;
+  margin: 20px auto;
+}
+
+/*
+=============== 
+Shapes Form Styles
+===============
+*/
+.shapes-title{
+  text-align: center;
+}
+
+.shapes-container{
+
+  padding: 0;
+  overflow: scroll;
+}
+
+.shapes-container div{
+
+    width: 100%;
+    height: 100%;
+    overflow: auto; /* or overflow: scroll; */
+    border: 1px solid #ccc;
+    box-sizing: border-box; /* Ensure the width and height include padding and border */
+  
 }

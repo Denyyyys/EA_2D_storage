@@ -3,18 +3,18 @@ import { createSlice } from '@reduxjs/toolkit';
 const storeSizeSlice = createSlice({
 	name: 'storeSize',
 	initialState: {
-		storeWidth: 3,
-		storeHeight: 4
+		storeWidth: 4,
+		storeHeight: 3
 	},
 	reducers: {
 		setStoreWidth: (state, action) => {
-			console.log(action);
+			console.log();
 			if (action.payload !== "")
-				state.storeWidth = action.payload;
+				state.storeWidth = parseInt(action.payload);
 		},
 		setStoreHeight: (state, action) =>{
 			if (action.payload !== "")
-				state.storeHeight = action.payload
+				state.storeHeight = parseInt(action.payload);
 		},
 	},
 });
