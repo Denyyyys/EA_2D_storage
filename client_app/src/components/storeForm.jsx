@@ -13,6 +13,7 @@ function StoreForm() {
 	// const { products, currentProduct } = useSelector(state => state.products)
 
 	const [isButtonDisabled, setButtonDisabled] = useState(false);
+
 	const clickProductCellHandler = (event) => {
 		const row = event.target.dataset.row;
 		const column = event.target.dataset.column;
@@ -52,6 +53,13 @@ function StoreForm() {
 		if (isRectangle(currentProduct)) {
 			const { width, height } = getRectangleSize(currentProduct);
 			dispatch(addProduct({ width, height }))
+			// const cellsDOM = document.querySelectorAll('store-grid');
+			// console.log(1111111111111111111111111);
+			// for (let i = 0; i < cellsDOM.length; i++) {
+			// 	const item = cellsDOM[i];
+			// 	item.dataset.clicked = "false"
+			// 	item.dataset.style.backgroundColor = '#f1f5f8';
+			// }
 			toast.success('Success!', { position: toast.POSITION.TOP_CENTER, autoClose: 3000, closeOnClick: true });
 		}
 		else {
@@ -91,7 +99,7 @@ function StoreForm() {
 							// }))
 						}} value={storeHeight} required />
 					</div>
-				</div>/
+				</div>
 				<p className="new-product-title">Create Forms of your products by clicking in the squares</p>
 			</div>
 
