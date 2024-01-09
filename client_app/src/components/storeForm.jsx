@@ -86,7 +86,7 @@ function StoreForm() {
 					<div className="form-group">
 
 						<label htmlFor="widthStore">Width of store (m)</label>
-						<input type="number" id="widthStore" value={storeWidth} name="widthStore" min="3" max="100" placeholder="Width of store (m)" onChange={(e) => {
+						<input type="number" id="widthStore" value={storeWidth} name="widthStore" min="3" max="50" placeholder="Width of store (m)" onChange={(e) => {
 							dispatch(setStoreWidth(e.target.value));
 							// dispatch(initCurrentProduct({
 							// 	width: parseInt(e.target.value),
@@ -96,7 +96,7 @@ function StoreForm() {
 					</div>
 					<div className="form-group">
 						<label htmlFor="lengthStore">Length of store (m)</label>
-						<input type="number" id="widthStore" name="widthStore" min="3" max="100" placeholder="Length of store (m)" onChange={(e) => {
+						<input type="number" id="widthStore" name="widthStore" min="3" max="50" placeholder="Length of store (m)" onChange={(e) => {
 							dispatch(setStoreHeight(e.target.value));
 							// dispatch(initCurrentProduct({
 							// 	width: storeWidth,
