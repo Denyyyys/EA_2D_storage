@@ -1,0 +1,1 @@
+NOT_ENOUGH_SPACE_MSG = "Products cannot locate in this storage!"
