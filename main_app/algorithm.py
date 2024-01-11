@@ -1,5 +1,11 @@
-import random
+# import libraries
 from typing import List, Dict, Tuple, Callable
+import random
+import numpy as np
+
+# import custom modules
+import constants
+
 
 ####################################
 ### Classes and custom types 	 ###
@@ -12,11 +18,15 @@ class Product_info:
 
 
 class Individual:
-	def __init__(self, store_width: int, store_height: int, list_product: List[Product_info], enter_position: Tuple[int, int]):
-		self.products_location = create_random_products_position(list_product)
+	def __init__(self, store_width: int, store_height: int, list_products: List[Product_info], enter_position: Tuple[int, int] = (0, 0)):
+		if not is_enough_space(list_products, store_width, store_height):
+			raise ValueError(constants.NOT_ENOUGH_SPACE_MSG)
+		self.products_location = create_random_products_position(list_products)
 		self.store_width = store_width
 		self.store_height = store_height
 		self.enter_position = enter_position
+		self.list_products = list_products
+
 
 
 Population = List[Individual]
@@ -24,9 +34,9 @@ Population = List[Individual]
 ####################################
 ### Functions for EA 			 ###
 ####################################
-def is_enough_space(list_product: List[Product_info], store_width: int, store_height: int) -> bool:
+def is_enough_space(list_products: List[Product_info], store_width: int, store_height: int) -> bool:
 	total_space = 0
-	for product_info in list_product:
+	for product_info in list_products:
 		total_space += product_info["width"] * product_info["height"]
 	return total_space < store_width*store_height
 
@@ -36,8 +46,8 @@ def get_best_individual(population: Population) -> Individual:
     return sorted_pop[0]
 
 
-def get_random_population(number_individuals: int, store_width: int, store_height: int, list_product: List[Product_info], enter_position: Tuple[int, int]):
-    population = [Individual(store_width, store_height, list_product, enter_position) for _ in range(number_individuals)]
+def create_random_population(number_individuals: int, store_width: int, store_height: int, list_products: List[Product_info], enter_position: Tuple[int, int] = (0, 0)):
+    population = [Individual(store_width, store_height, list_products, enter_position) for _ in range(number_individuals)]
     return population
 
 
@@ -45,8 +55,9 @@ def sort_population(population: Population):
     return sorted(population, key=get_cost)
 
 
-def create_random_products_position(list_product: List[Dict]) -> List:
-	# DF
+def create_random_products_position(list_products: List[Product_info]) -> List:
+	products_location = np.full((rows, columns), fill_value=[0], dtype=object)
+
 	pass
 
 
