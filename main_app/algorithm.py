@@ -5,7 +5,7 @@ import numpy as np
 
 # import custom modules
 import constants
-
+from utility import get_available_positions_for_product
 
 ####################################
 ### Classes and custom types 	 ###
@@ -18,12 +18,12 @@ class Product_info:
 
 
 class Individual:
-	def __init__(self, store_width: int, store_height: int, list_products: List[Product_info], enter_position: Tuple[int, int] = (0, 0)):
-		if not is_enough_space(list_products, store_width, store_height):
+	def __init__(self, storage_width: int, storage_height: int, list_products: List[Product_info], enter_position: Tuple[int, int] = (0, 0)):
+		if not is_enough_space(list_products, storage_width, storage_height):
 			raise ValueError(constants.NOT_ENOUGH_SPACE_MSG)
-		self.products_location = create_random_products_position(list_products)
-		self.store_width = store_width
-		self.store_height = store_height
+		self.products_location = create_random_products_position(list_products, storage_width, storage_height)
+		self.storage_width = storage_width
+		self.storage_height = storage_height
 		self.enter_position = enter_position
 		self.list_products = list_products
 
@@ -34,11 +34,11 @@ Population = List[Individual]
 ####################################
 ### Functions for EA 			 ###
 ####################################
-def is_enough_space(list_products: List[Product_info], store_width: int, store_height: int) -> bool:
+def is_enough_space(list_products: List[Product_info], storage_width: int, storage_height: int) -> bool:
 	total_space = 0
 	for product_info in list_products:
 		total_space += product_info["width"] * product_info["height"]
-	return total_space < store_width*store_height
+	return total_space < storage_width*storage_height
 
 
 def get_best_individual(population: Population) -> Individual:
@@ -46,8 +46,8 @@ def get_best_individual(population: Population) -> Individual:
     return sorted_pop[0]
 
 
-def create_random_population(number_individuals: int, store_width: int, store_height: int, list_products: List[Product_info], enter_position: Tuple[int, int] = (0, 0)):
-    population = [Individual(store_width, store_height, list_products, enter_position) for _ in range(number_individuals)]
+def create_random_population(number_individuals: int, storage_width: int, storage_height: int, list_products: List[Product_info], enter_position: Tuple[int, int] = (0, 0)):
+    population = [Individual(storage_width, storage_height, list_products, enter_position) for _ in range(number_individuals)]
     return population
 
 
@@ -55,10 +55,32 @@ def sort_population(population: Population):
     return sorted(population, key=get_cost)
 
 
-def create_random_products_position(list_products: List[Product_info]) -> List:
-	products_location = np.full((rows, columns), fill_value=[0], dtype=object)
+def create_random_products_position(list_products: List[Product_info], storage_width: int, storage_height: int) -> List[List[List[str]]]:
+	products_location = []
+	products_location = [([[0] for _ in range(storage_width)]) for _ in range(storage_height)]
+	for product in list_products:
+		x_start_max, y_start_max = get_available_positions_for_product(
+			storage_width,
+			storage_height,
+			product["width"],
+			product["height"]
+		)
+		x = random.randint(0, x_start_max)
+		y = random.randint(0, y_start_max)
+		for i in range(y, y + product["height"]):
+			print()
+			for j in range(x, x + product["width"]):				
+				products_location[i][j].append(product["id"])
 
-	pass
+	for i in range(storage_height):
+		print('')
+		for j in range(storage_width):
+			print(products_location[i][j])
+   
+   
+	# TODO: add products into storage
+	return products_location 
+
 
 
 def mutation(individual: Individual, mutation_power: int, mutation_probability: float) -> Individual:
@@ -68,8 +90,10 @@ def mutation(individual: Individual, mutation_power: int, mutation_probability: 
 	pass
 
 
-def get_available_positions(individual: Individual, mutation_power: int) -> List:
-	## BB
+def get_available_positions(individual: Individual, mutation_power: int) -> List[Dict[str,Tuple[int, int]]]:
+	for product in individual.list_products:
+		print(product)
+ 	# get_available_positions_for_product(individual.storage_width, individual.storage_height, individual)
 	pass
 
 
@@ -89,33 +113,34 @@ def threshold_selection(population: Population):
 
 
 def get_cost(individual: Individual) -> float:
-    ## DF
-	pass
+    cost = 0
+    punishment = get_punishment(individual)
+    return cost + punishment
 
 
 def get_punishment(individual: Individual) -> float:
-	## DF
-	pass
+	punishment = get_punishment_overlap(individual) + get_punishment_cannot_enter(individual) + get_punishment_blocked_free_space(individual) + get_punishment_blocked_products(individual)
+	return punishment
 
 
 def get_punishment_overlap(individual: Individual, cost = 400) -> float:
 	## DF
-	pass
+	return 0
 
 
 def get_punishment_cannot_enter(individual: Individual, cost = 400) -> float:
 	## DF
-	pass
+	return 0
 
 
 def get_punishment_blocked_free_space(individual: Individual, cost = 400) -> float:
 	## DF
-	pass
+	return 0
 
 
 def get_punishment_blocked_products(individual: Individual, cost_per_frame = 100) -> float:
 	## DF
-	pass
+	return 0
 
 
 def run_simulation(
