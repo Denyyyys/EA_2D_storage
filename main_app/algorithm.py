@@ -10,12 +10,14 @@ from utility import get_available_positions_for_product, print_products_location
 ####################################
 ### Classes and custom types 	 ###
 ####################################
-class Product_info:
-    def __init__(self, width: int, height: int, id: str):
-        self.width = width
-        self.height = height
-        self.id = id
 
+# class Product_info:
+#     def __init__(self, width: int, height: int, id: str):
+#         self.width = width
+#         self.height = height
+#         self.id = id
+
+Product_info = {"width": int, "height": int, "id": str}
 
 class Individual:
 	def __init__(self, storage_width: int, storage_height: int, list_products: List[Product_info], enter_position: Tuple[int, int] = (0, 0)):
@@ -28,9 +30,17 @@ class Individual:
 		self.list_products = list_products
 
 
-
 Population = List[Individual]
-
+Hyperparameters = {
+	"mutation_probability": float,
+	"mutation_power": int,
+	"number_individuals": int,
+	"max_iterations": int,
+	"storage_width": int,
+	"storage_height": int,
+	"products": List[Product_info],
+	"entry": Tuple[int, int]
+}
 ####################################
 ### Functions for EA 			 ###
 ####################################
@@ -75,11 +85,19 @@ def create_random_products_position(list_products: List[Product_info], storage_w
 
 
 
-def mutation(individual: Individual, mutation_power: int, mutation_probability: float) -> Individual:
+def mutation_by_one_side(individual: Individual, mutation_power: int, mutation_probability: float) -> Individual:
 	## BB
 	# wybiramy losowo produkt
-	# 2 implementacje zmiany położenia produktu
+	# implementacja zmiany położenia produktu tylko w jedną stronę
 	return individual 
+
+
+def mutation_by_two_sides(individual: Individual, mutation_power: int, mutation_probability: float) -> Individual:
+	## BB
+	# wybiramy losowo produkt
+	# implementacja zmiany położenia produktu w dwie strony
+	return individual 
+
 
 
 def get_available_origin_positions(individual: Individual, mutation_power: int) -> List[Dict[str,Tuple[int, int]]]:
@@ -178,19 +196,28 @@ def get_punishment_blocked_products(individual: Individual, cost_per_frame = 100
 
 
 def run_simulation(
-    cost_individual_func: Callable[[Individual], float],
-    get_best_individual: Callable[[Population], Individual],
-    get_init_population: Callable[[int], Population],
-    selection_func: Callable[[Population], Population],
-    mutation_func: Callable[[Population, int, float], Population],
-    succession_func: Callable[[Population], Population] = None,
-    mutation_probability: float = 0.2,
-    mutation_power: float = 2,
-    number_individuals: int = 100,
-    max_iterations: int = 100):
+	cost_individual_func: Callable[[Individual], float],
+	get_best_individual: Callable[[Population], Individual],
+	get_init_population: Callable[[int, int, int, List[Product_info], Tuple[int, int]], Population],
+	selection_func: Callable[[Population], Population],
+	mutation_func: Callable[[Population, int, float], Population],
+	hyperparameters: Hyperparameters,
+	succession_func: Callable[[Population], Population] = None):
     
+
+	mutation_probability, mutation_power, number_individuals, max_iterations, storage_width, storage_height, products, entry = (
+    hyperparameters["mutation_probability"],
+    hyperparameters["mutation_power"],
+    hyperparameters["number_individuals"],
+    hyperparameters["max_iterations"],
+    hyperparameters["storage_width"],
+    hyperparameters["storage_height"],
+    hyperparameters["products"],
+    hyperparameters["entry"]
+)
 	populations: List[Population] = []
-	init_population = get_init_population(number_individuals)
+	
+	init_population = get_init_population(number_individuals, storage_width, storage_height, products, entry)
 	populations.append(init_population)
 	best_individual = get_best_individual(init_population)
 	best_individual_cost = cost_individual_func(best_individual)
