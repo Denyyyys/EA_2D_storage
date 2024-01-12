@@ -8,3 +8,11 @@ def get_available_positions_for_product(storage_width: int, storage_height: int,
     
     return (x_start_max, y_start_max)
     
+
+def print_products_location(individual):
+    products_location = individual.products_location
+    
+    for i in range(individual.storage_height):
+        for j in range(individual.storage_width):
+            print(products_location[i][j], end=" ")
+        print()

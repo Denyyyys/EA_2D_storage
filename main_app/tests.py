@@ -19,7 +19,6 @@ class TestEnoughSpaceCheck(unittest.TestCase):
             Individual(storage_width, storage_height, products, (0, 0))
 
         self.assertEqual(str(context.exception), constants.NOT_ENOUGH_SPACE_MSG)
-
         self.assertFalse(is_enough_space(products, storage_width, storage_height))
         
         products = incorrect_too_much_products_list_product["products"]
@@ -38,7 +37,16 @@ class TestIndividual(unittest.TestCase):
         storage_width = correct_list_products["storage_width"]
         storage_height = correct_list_products["storage_height"]
         individual = Individual(storage_width, storage_height, products)
-        
+        print()
+        print('Before deleting product:')
+        print_products_location(individual)
+        get_available_origin_positions(individual, 2)
+        delete_product_from_products_location(individual.products_location, "bbbb7cb9-e1e0-4ba1-a807-3f9b66ffd200")
+        print('After deleting product with id = bbbb7cb9-e1e0-4ba1-a807-3f9b66ffd200:')
+        print_products_location(individual)
+        print('After adding product with id = bbbb7cb9-e1e0-4ba1-a807-3f9b66ffd200: ')
+        add_product_to_product_location(individual.products_location, 2, 2, "bbbb7cb9-e1e0-4ba1-a807-3f9b66ffd200", 1, 2)
+        print_products_location(individual)
         self.assertEqual(individual.storage_height, storage_height)
         self.assertEqual(individual.storage_width, storage_width)
         self.assertEqual(len(individual.list_products), len(products))

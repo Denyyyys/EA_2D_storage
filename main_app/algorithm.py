@@ -5,7 +5,7 @@ import numpy as np
 
 # import custom modules
 import constants
-from utility import get_available_positions_for_product
+from utility import get_available_positions_for_product, print_products_location
 
 ####################################
 ### Classes and custom types 	 ###
@@ -55,7 +55,7 @@ def sort_population(population: Population):
     return sorted(population, key=get_cost)
 
 
-def create_random_products_position(list_products: List[Product_info], storage_width: int, storage_height: int) -> List[List[List[str]]]:
+def create_random_products_position(list_products: List[Product_info], storage_width: int, storage_height: int) -> List[List[List[str | int]]]:
 	products_location = []
 	products_location = [([[0] for _ in range(storage_width)]) for _ in range(storage_height)]
 	for product in list_products:
@@ -68,17 +68,9 @@ def create_random_products_position(list_products: List[Product_info], storage_w
 		x = random.randint(0, x_start_max)
 		y = random.randint(0, y_start_max)
 		for i in range(y, y + product["height"]):
-			print()
 			for j in range(x, x + product["width"]):				
 				products_location[i][j].append(product["id"])
 
-	for i in range(storage_height):
-		print('')
-		for j in range(storage_width):
-			print(products_location[i][j])
-   
-   
-	# TODO: add products into storage
 	return products_location 
 
 
@@ -87,29 +79,71 @@ def mutation(individual: Individual, mutation_power: int, mutation_probability: 
 	## BB
 	# wybiramy losowo produkt
 	# 2 implementacje zmiany położenia produktu
-	pass
+	return individual 
 
 
-def get_available_positions(individual: Individual, mutation_power: int) -> List[Dict[str,Tuple[int, int]]]:
+def get_available_origin_positions(individual: Individual, mutation_power: int) -> List[Dict[str,Tuple[int, int]]]:
+	product_origins = [] 
 	for product in individual.list_products:
-		print(product)
- 	# get_available_positions_for_product(individual.storage_width, individual.storage_height, individual)
-	pass
+		product_start_x = None
+		product_start_y = None
+		product_origin_found = False
+		for i in range(individual.storage_height):
+			for j in range(individual.storage_width):				
+				if (product["id"] in individual.products_location[i][j]):
+					product_start_y = i
+					product_start_x = j
+					product_origin_found = True
+					break
+			if product_origin_found:
+				break
+		
+		if not product_origin_found:
+			raise ValueError(f'There is no product with id: {product["id"]} in storage')
+
+		min_x_origin_pos = max(0, product_start_x - mutation_power)
+		min_y_origin_pos = max(0, product_start_y - mutation_power)
+		max_x_origin_pos = min(individual.storage_width - product["width"], product_start_x + mutation_power)
+		max_y_origin_pos = min(individual.storage_height - product["height"], product_start_y + mutation_power)
+		product_origins.append({"id": product["id"], "min_x_origin_pos": min_x_origin_pos,"max_x_origin_pos": max_x_origin_pos,"min_y_origin_pos": min_y_origin_pos, "max_y_origin_pos": max_y_origin_pos})
+	return product_origins
+
+
+def delete_product_from_products_location(products_location: List[List[List[str | int]]], id: str):
+	for products_row in products_location:
+		for product in products_row:
+			if id in product:
+				product.remove(id)
+
+	return products_location
+
+
+def add_product_to_product_location(product_location: List[List[List[str | int]]], product_width: int, product_height: int, id: str, product_origin_x: int, product_origin_y: int):
+	storage_height = len(product_location)
+	storage_width = len(product_location[0])
+	if product_origin_x + product_width > storage_width or product_origin_y + product_height > storage_height:
+		raise ValueError('Product is out of storage!')
+
+	for i in range(product_origin_y, min(storage_height, product_origin_y + product_height)):
+		for j in range(product_origin_x, min(storage_width, product_origin_x + product_width)):
+			product_location[i][j].append(id)
+
+	return product_location
 
 
 def tournament_selection(population: Population):
 	## BB
-	pass
+	return population
 
 
 def roulet_selection(population: Population):
 	## BB
-	pass
+	return population
 
 
 def threshold_selection(population: Population):
 	## BB
-	pass
+	return population
 
 
 def get_cost(individual: Individual) -> float:
