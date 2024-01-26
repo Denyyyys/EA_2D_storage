@@ -5,7 +5,8 @@ import numpy as np
 
 # import custom modules
 import constants
-from utility import get_available_positions_for_product, print_products_location
+from utility import get_available_positions_for_product, print_products_location, get_product_origin_by_id, \
+	delete_product_from_products_location, add_product_to_product_location, Product_info, get_product
 
 ####################################
 ### Classes and custom types 	 ###
@@ -17,7 +18,7 @@ from utility import get_available_positions_for_product, print_products_location
 #         self.height = height
 #         self.id = id
 
-Product_info = {"width": int, "height": int, "id": str}
+
 
 class Individual:
 	def __init__(self, storage_width: int, storage_height: int, list_products: List[Product_info], enter_position: Tuple[int, int] = (0, 0)):
@@ -28,6 +29,11 @@ class Individual:
 		self.storage_height = storage_height
 		self.enter_position = enter_position
 		self.list_products = list_products
+
+	def __str__(self):
+		return("1")
+		print(f"cost: {get_cost(self)}")
+		print_products_location(self)
 
 
 Population = List[Individual]
@@ -85,18 +91,70 @@ def create_random_products_position(list_products: List[Product_info], storage_w
 
 
 
-def mutation_by_one_side(individual: Individual, mutation_power: int, mutation_probability: float) -> Individual:
+def mutation_by_one_side(population: List[Individual], mutation_power: int, mutation_probability: float) -> List[Individual]:
 	## BB
 	# wybiramy losowo produkt
 	# implementacja zmiany położenia produktu tylko w jedną stronę
-	return individual 
+	for individual in population:
+		rand_number = random.uniform(0, 1)
+		available_positions = get_available_origin_positions(individual, mutation_power)
+		for available_position in available_positions:
+			if mutation_probability == 1 or rand_number < mutation_probability:
+				curr_x, curr_y = get_product_origin_by_id(available_position.id, individual.products_location)
+				next_origin_pos = get_next_pos_one_side(available_position.min_x_origin_pos, available_position.max_x_origin_pos,
+                                     			 available_position.min_y_origin_pos, available_position.max_y_origin_pos, 
+                                         		 curr_x, curr_y)
+				product = get_product(available_position.id, individual)
+				individual.products_location = delete_product_from_products_location(individual.products_location,available_position.id)
+
+				individual.products_location = add_product_to_product_location(individual.products_location, product.width, product.height, product.id,next_origin_pos[0], next_origin_pos[1])		
+  
+  
+	return population
 
 
-def mutation_by_two_sides(individual: Individual, mutation_power: int, mutation_probability: float) -> Individual:
+def get_next_pos_one_side(min_x:int, max_x:int, min_y:int, max_y:int, curr_x:int, curr_y:int) -> Tuple(int):
+	dirr = None # if 0 then mutation goes for y direction, if 1 - x direction  
+	list_new_positions = []
+	if (min_x == max_x) and (min_y == max_y):
+		raise ValueError("Cannot mutate product, which size is size of factory")
+	elif min_x == max_x:
+		dirr = 0 
+	elif min_y == max_y:
+		dirr = 1
+	elif min_x < max_x and min_y < max_y:
+		dirr = random.randint(0, 1)
+	else:
+		raise ValueError("Your positions are wrong :/")
+
+	if dirr == 0:
+		list_new_positions = [(curr_x, i) for i in range(min_y, max_y+1)]
+	else:
+		list_new_positions = [(i, curr_y) for i in range(min_x, max_x+1)]
+
+	filtered_list_new_positions = [item for item in list_new_positions if item != (curr_x, curr_y)]
+ 
+	
+	next_pos = random.choice(filtered_list_new_positions)
+ 
+	return next_pos
+
+
+  
+        
+def get_next_pos_two_sides(min_x, max_x, min_y, max_y, curr_x, curr_y):
+    # tuple_array = [(a, b) for a in range(a_min, a_max + 1) for b in range(b_min, b_max + 1)]
+	pass
+
+
+
+def mutation_by_two_sides(population: List[Individual], mutation_power: int, mutation_probability: float) -> List[Individual]:
 	## BB
 	# wybiramy losowo produkt
 	# implementacja zmiany położenia produktu w dwie strony
-	return individual 
+
+ 
+	return population 
 
 
 
@@ -127,26 +185,7 @@ def get_available_origin_positions(individual: Individual, mutation_power: int) 
 	return product_origins
 
 
-def delete_product_from_products_location(products_location: List[List[List[str | int]]], id: str):
-	for products_row in products_location:
-		for product in products_row:
-			if id in product:
-				product.remove(id)
 
-	return products_location
-
-
-def add_product_to_product_location(product_location: List[List[List[str | int]]], product_width: int, product_height: int, id: str, product_origin_x: int, product_origin_y: int):
-	storage_height = len(product_location)
-	storage_width = len(product_location[0])
-	if product_origin_x + product_width > storage_width or product_origin_y + product_height > storage_height:
-		raise ValueError('Product is out of storage!')
-
-	for i in range(product_origin_y, min(storage_height, product_origin_y + product_height)):
-		for j in range(product_origin_x, min(storage_width, product_origin_x + product_width)):
-			product_location[i][j].append(id)
-
-	return product_location
 
 
 def tournament_selection(population: Population):
@@ -171,13 +210,14 @@ def get_cost(individual: Individual) -> float:
 
 
 def get_punishment(individual: Individual) -> float:
-	punishment = get_punishment_overlap(individual) + get_punishment_cannot_enter(individual) + get_punishment_blocked_free_space(individual) + get_punishment_blocked_products(individual)
+	punishment = get_punishment_overlap(individual) + get_punishment_cannot_enter(individual) + \
+     get_punishment_blocked_free_space(individual) + get_punishment_blocked_products(individual)
 	return punishment
 
 
 def get_punishment_overlap(individual: Individual, cost = 400) -> float:
 	## DF
-	return 0
+	return 10
 
 
 def get_punishment_cannot_enter(individual: Individual, cost = 400) -> float:
@@ -218,6 +258,9 @@ def run_simulation(
 	populations: List[Population] = []
 	
 	init_population = get_init_population(number_individuals, storage_width, storage_height, products, entry)
+	for i in init_population:
+		print_products_location(i)
+		print('----------------------')
 	populations.append(init_population)
 	best_individual = get_best_individual(init_population)
 	best_individual_cost = cost_individual_func(best_individual)
