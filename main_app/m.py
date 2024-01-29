@@ -13,8 +13,8 @@ Hyperparameters = {
 	"max_iterations": int,
 	"storage_width": int,
 	"storage_height": int,
-	"products": List[Product_info],
-	"entry": Tuple[int, int]
+	"products": int,
+	"entry": int
 }
 
 NOT_ENOUGH_SPACE_MSG = "Products cannot locate in this storage!"
@@ -23,14 +23,14 @@ NO_PRODUCT_WITH_ID = "There is no product with id: {0} in storage"
 
 
 
-def is_enough_space(list_products: List[Product_info], storage_width: int, storage_height: int) -> bool:
+def is_enough_space(list_products, storage_width: int, storage_height: int) -> bool:
 	total_space = 0
 	for product_info in list_products:
 		total_space += product_info["width"] * product_info["height"]
 	return total_space < storage_width*storage_height
 
 
-def create_random_products_position(list_products: List[Product_info], storage_width: int, storage_height: int) -> List[List[List[str | int]]]:
+def create_random_products_position(list_products, storage_width: int, storage_height: int):
 	products_location = []
 	products_location = [([[0] for _ in range(storage_width)]) for _ in range(storage_height)]
 	for product in list_products:
@@ -48,16 +48,16 @@ def create_random_products_position(list_products: List[Product_info], storage_w
 	return products_location 
 
 
-def get_available_positions_for_product(storage_width: int, storage_height: int, product_width: int, product_height: int) -> Tuple[int, int]:
+def get_available_positions_for_product(storage_width: int, storage_height: int, product_width: int, product_height: int):
     if (product_width > storage_width or product_height > storage_height) or (product_width == storage_width and product_height == storage_height):
-        raise ValueError(constants.PRODUCT_TOO_BIG_FOR_STORAGE)
+        raise ValueError(PRODUCT_TOO_BIG_FOR_STORAGE)
     x_start_max = storage_width - product_width
     y_start_max = storage_height - product_height
     
     return (x_start_max, y_start_max)
 
 
-def get_number_overlaps(products_location: List[List[List[int]]]) -> int:
+def get_number_overlaps(products_location) -> int:
     total_overlaps = 0
     for products_row in products_location:
         for product_cell in products_row:
@@ -65,7 +65,7 @@ def get_number_overlaps(products_location: List[List[List[int]]]) -> int:
     return total_overlaps
 
 
-def get_free_space_coordinates(products_location: List[List[List[int]]]) -> List[List[int]]:
+def get_free_space_coordinates(products_location):
     # [x,y]
     free_spaces_arr = []
     for i in range(len(products_location)):
@@ -75,7 +75,7 @@ def get_free_space_coordinates(products_location: List[List[List[int]]]) -> List
     return free_spaces_arr
     
 
-def get_min_number_blocked(products_location: List[List[List[int]]]) -> int:
+def get_min_number_blocked(products_location) -> int:
     free_space_arr = get_free_space_coordinates(products_location)
     
     
@@ -448,3 +448,48 @@ def run_simulation(
 		populations.append(curr_population)
   
 	return (populations, best_individual, best_individual_cost)
+
+
+if __name__ == '__main__':
+    correct_list_products = {
+        # "products":[
+        #     {"width": 2, "height": 1, "id": "aaaa7cb9-e1e0-4ba1-a807-3f9b66ffd200"},
+        #     {"width": 2, "height": 2, "id": "bbbb7cb9-e1e0-4ba1-a807-3f9b66ffd200"},
+        #     {"width": 1, "height": 1, "id": "cccc7cb9-e1e0-4ba1-a807-3f9b66ffd200"},
+        #     {"width": 1, "height": 1, "id": "dddd7cb9-e1e0-4ba1-a807-3f9b66ffd200"},
+        #     {"width": 1, "height": 1, "id": "eeee7cb9-e1e0-4ba1-a807-3f9b66ffd200"},
+        # ],
+        "products":[
+            {"width": 2, "height": 1, "id": "a"},
+            {"width": 2, "height": 2, "id": "b"},
+            {"width": 1, "height": 1, "id": "c"},
+            {"width": 1, "height": 1, "id": "d"},
+            {"width": 1, "height": 1, "id": "e"},
+        ],
+        "storage_width": 3,
+        "storage_height": 5
+    }
+    products, storage_width, storage_height = correct_list_products["products"], correct_list_products["storage_width"], correct_list_products["storage_height"]
+    hyperparameters = {
+        "mutation_probability": 1,
+        "number_products_to_mutate": 2,
+        "mutation_power": 5,
+        "number_individuals": 2,
+        "max_iterations": 100,
+        "storage_width": storage_width,
+        "storage_height": storage_height,
+        "products": products,
+        "entry": [0,1]
+    }
+    
+    populations, best_individual, best_individual_cost = run_simulation(
+        cost_individual_func=get_cost,
+        get_best_individual=get_best_individual, 
+        get_init_population=create_random_population,
+        selection_func=tournament_selection, 
+        mutation_func=mutation_by_one_side_product, 
+        hyperparameters=hyperparameters
+    )
+    # print(populations)
+    print_products_location(best_individual)
+    print(best_individual_cost)
