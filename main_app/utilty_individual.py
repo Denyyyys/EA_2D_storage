@@ -43,3 +43,18 @@ def get_number_overlaps(products_location: List[List[List[int]]]) -> int:
         for product_cell in products_row:
             total_overlaps += max(0, len(product_cell) - 2)
     return total_overlaps
+
+
+def get_free_space_coordinates(products_location: List[List[List[int]]]) -> List[List[int]]:
+    # [x,y]
+    free_spaces_arr = []
+    for i in range(len(products_location)):
+        for j in range(len(len(products_location[i]))):
+            if products_location[i][j] == ['0']:
+                free_spaces_arr.append([j, i])
+    return free_spaces_arr
+    
+
+def get_min_number_blocked(products_location: List[List[List[int]]]) -> int:
+    free_space_arr = get_free_space_coordinates(products_location)
+    
