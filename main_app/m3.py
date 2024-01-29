@@ -390,9 +390,9 @@ def tournament_selection(population):
         individual_1 = random.choice(population)
         individual_2 = random.choice(population)
         if get_cost(individual_1) > get_cost(individual_2):
-            next_population.append(individual_2)
+            next_population.append(copy_individual(individual_2))
         else:
-            next_population.append(individual_1)
+            next_population.append(copy_individual(individual_1))
     return next_population
 
 
@@ -471,6 +471,23 @@ def get_punishment_blocked_products(individual: Individual, cost_per_frame = 100
 	
 	return 0
 
+
+def copy_individual(individual: Individual):
+	products_locations_copy = []
+	
+	for i in range(len(individual.products_location)):
+		temp_row = []
+		for j in range(len(individual.products_location[0])):
+			temp_arr = []
+			for element in individual.products_location[i][j]:
+				temp_arr.append(element)
+			temp_row.append(temp_arr)
+		products_locations_copy.append(temp_row)
+
+	individual_copy = Individual(individual.storage_width, individual.storage_height, individual.list_products,[individual.enter_position[0],individual.enter_position[1]])
+	
+	individual_copy.products_location = products_locations_copy    
+	return individual_copy
 
 def run_simulation(
 	cost_individual_func,
