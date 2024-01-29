@@ -115,7 +115,7 @@ def get_product_origin_by_id(id: str, products_location) -> Tuple[int]:
     return origin
 
 
-def delete_product_from_products_location(products_location: List[List[List[str | int]]], id: str):
+def delete_product_from_products_location(products_location, id: str):
 	for products_row in products_location:
 		for product in products_row:
 			if id in product:
@@ -124,7 +124,7 @@ def delete_product_from_products_location(products_location: List[List[List[str 
 	return products_location
 
 
-def add_product_to_product_location(product_location: List[List[List[str | int]]], product_width: int, product_height: int, id: str, product_origin_x: int, product_origin_y: int):
+def add_product_to_product_location(product_location, product_width: int, product_height: int, id: str, product_origin_x: int, product_origin_y: int):
 	storage_height = len(product_location)
 	storage_width = len(product_location[0])
 	if product_origin_x + product_width > storage_width or product_origin_y + product_height > storage_height:
@@ -153,9 +153,9 @@ def get_product(id:int, individual) -> Product_info:
 ### Classes 	 				 ###
 ####################################
 class Individual:
-	def __init__(self, storage_width: int, storage_height: int, list_products: List[Product_info], enter_position: List[int] = [0, 1]):
+	def __init__(self, storage_width: int, storage_height: int, list_products, enter_position = [0, 1]):
 		if not is_enough_space(list_products, storage_width, storage_height):
-			raise ValueError(constants.NOT_ENOUGH_SPACE_MSG)
+			raise ValueError(NOT_ENOUGH_SPACE_MSG)
 		self.products_location = create_random_products_position(list_products, storage_width, storage_height)
 		self.storage_width = storage_width
 		self.storage_height = storage_height
@@ -168,7 +168,7 @@ class Individual:
 		print(f"cost: {get_cost(self)}")
 		print_products_location(self)
   
-	def get_available_origin_positions(self, mutation_power: int) -> List[Dict[str,Tuple[int, int]]]:
+	def get_available_origin_positions(self, mutation_power: int):
 		product_origins = [] 
 		for product in self.list_products:
 			product_start_x = None
@@ -203,14 +203,14 @@ Population = List[Individual]
 
 
 def create_random_population(number_individuals: int, storage_width: int, storage_height: int, 
-                             list_products: List[Product_info], enter_position: Tuple[int, int] = (0, 0)):
+                             list_products, enter_position = (0, 0)):
     population = [Individual(storage_width, storage_height, list_products, enter_position) for _ in range(number_individuals)]
     return population
 
 
 # create population near point, which is provided
 def create_random_population_normal(number_individuals: int, storage_width: int, storage_height: int, 
-                             list_products: List[Product_info],  enter_position: Tuple[int, int] = (0, 0)):
+                             list_products,  enter_position = (0, 0)):
 	pass
 
 
@@ -219,7 +219,7 @@ def create_random_population_normal(number_individuals: int, storage_width: int,
 ####################################
 
 # mutation can work for every product or for none
-def mutation_by_one_side_diff_products(population: List[Individual], mutation_power: int, mutation_probability: float) -> List[Individual]:
+def mutation_by_one_side_diff_products(population, mutation_power: int, mutation_probability: float):
 	# Chose randomly products, which will be mutated
 	# Change of product origin is possible only in one direction (up, down or left, right)
 	for individual in population:
@@ -246,7 +246,7 @@ def mutation_by_one_side_diff_products(population: List[Individual], mutation_po
 
 
 # mutation work only for specific amount of products
-def mutation_by_one_side_product(population: List[Individual], mutation_power: int, number_products_to_mutate: int) -> List[Individual]:
+def mutation_by_one_side_product(population, mutation_power: int, number_products_to_mutate: int):
 	# Chose randomly number_products_to_mutate products
 	# Change of product origin is possible only in one direction (up, down or left, right)
 	for individual in population:
@@ -277,7 +277,7 @@ def mutation_by_one_side_product(population: List[Individual], mutation_power: i
 	return population
 
 
-def get_next_pos_one_side(min_x:int, max_x:int, min_y:int, max_y:int, curr_x:int, curr_y:int) -> List[Tuple[int]]:
+def get_next_pos_one_side(min_x:int, max_x:int, min_y:int, max_y:int, curr_x:int, curr_y:int):
 	dirr = None # if 0 then mutation goes for y direction, if 1 - x direction  
 	list_new_positions = []
 	if (min_x == max_x) and (min_y == max_y):
@@ -302,7 +302,7 @@ def get_next_pos_one_side(min_x:int, max_x:int, min_y:int, max_y:int, curr_x:int
 	return filtered_list_new_positions
 
 
-def mutation_by_two_sides(population: List[Individual], mutation_power: int, mutation_probability: float) -> List[Individual]:
+def mutation_by_two_sides(population, mutation_power: int, mutation_probability: float):
 	## BB
 	# wybiramy losowo produkt
 	# implementacja zmiany położenia produktu w dwie strony
@@ -387,13 +387,13 @@ def get_punishment_blocked_products(individual: Individual, cost_per_frame = 100
 
 
 def run_simulation(
-	cost_individual_func: Callable[[Individual], float],
-	get_best_individual: Callable[[Population], Individual],
-	get_init_population: Callable[[int, int, int, List[Product_info], Tuple[int, int]], Population],
-	selection_func: Callable[[Population], Population],
-	mutation_func: Callable[[Population, int, float], Population],
-	hyperparameters: Hyperparameters,
-	succession_func: Callable[[Population], Population] = None):
+	cost_individual_func,
+	get_best_individual,
+	get_init_population,
+	selection_func,
+	mutation_func,
+	hyperparameters,
+	succession_func= None):
     
 
 	mutation_power, number_individuals, max_iterations, storage_width, storage_height, products, entry = (
@@ -465,6 +465,9 @@ if __name__ == '__main__':
             {"width": 1, "height": 1, "id": "c"},
             {"width": 1, "height": 1, "id": "d"},
             {"width": 1, "height": 1, "id": "e"},
+			{"width": 1, "height": 1, "id": "f"},
+			{"width": 1, "height": 1, "id": "g"},
+			{"width": 1, "height": 1, "id": "h"},
         ],
         "storage_width": 3,
         "storage_height": 5
@@ -479,7 +482,7 @@ if __name__ == '__main__':
         "storage_width": storage_width,
         "storage_height": storage_height,
         "products": products,
-        "entry": [0,1]
+        "entry": [0,0]
     }
     
     populations, best_individual, best_individual_cost = run_simulation(
