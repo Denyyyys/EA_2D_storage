@@ -10,6 +10,11 @@ import React, { useRef, useEffect } from 'react';
 function StoreForm() {
 	const dispatch = useDispatch();
 	const { storeWidth, storeHeight } = useSelector(state => state.storeSize)
+	const [selectedFile, setSelectedFile] = useState(null);
+	const handleFileChange = (event) => {
+		const file = event.target.files[0];
+		setSelectedFile(file);
+	}
 	// const { products, currentProduct } = useSelector(state => state.products)
 
 	const [isButtonDisabled, setButtonDisabled] = useState(false);
@@ -114,7 +119,12 @@ function StoreForm() {
 				{paragraphs}
 			</div>
 			<button disabled={isButtonDisabled} className="submit-product-btn btn btn-success" onClick={submitProductHandler} >Submit Product</button>
-		</form>
+			<label htmlFor="fileInput">Choose a file</label>
+			<input
+				type="file"
+				id="fileInput"
+				onChange={handleFileChange}
+			/>		</form>
 	)
 }
 export default StoreForm;

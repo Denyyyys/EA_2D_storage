@@ -21,13 +21,14 @@ if __name__ == '__main__':
     products, storage_width, storage_height = correct_list_products["products"], correct_list_products["storage_width"], correct_list_products["storage_height"]
     hyperparameters = {
         "mutation_probability": 1,
+        "number_products_to_mutate": 2,
         "mutation_power": 5,
-        "number_individuals": 10,
+        "number_individuals": 2,
         "max_iterations": 100,
         "storage_width": storage_width,
         "storage_height": storage_height,
         "products": products,
-        "entry": (0,0)
+        "entry": [0,1]
     }
     
     populations, best_individual, best_individual_cost = run_simulation(
@@ -35,8 +36,9 @@ if __name__ == '__main__':
         get_best_individual=get_best_individual, 
         get_init_population=create_random_population,
         selection_func=tournament_selection, 
-        mutation_func=mutation_by_one_side, 
+        mutation_func=mutation_by_one_side_product, 
         hyperparameters=hyperparameters
     )
-    
-    print(populations)
+    # print(populations)
+    print_products_location(best_individual)
+    print(best_individual_cost)

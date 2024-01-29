@@ -1,30 +1,22 @@
 from typing import List, Dict, Tuple, Callable
 import constants
 
-Product_info = {"width": int, "height": int, "id": str}
+from custom_types import Product_info, Hyperparameters
 
-def get_available_positions_for_product(storage_width: int, storage_height: int, product_width: int, product_height: int) -> Tuple[int, int]:
-    if product_width > storage_width or product_height > storage_height:
-        raise ValueError(constants.PRODUCT_TOO_BIG_FOR_STORAGE)
-    x_start_max = storage_width - product_width
-    y_start_max = storage_height - product_height
-    
-    return (x_start_max, y_start_max)
-    
 
 def print_products_location(individual):
     products_location = individual.products_location
     
     for i in range(individual.storage_height):
         for j in range(individual.storage_width):
-            print(products_location[i][j], end=" ")
+            print(products_location[i][j], end="")
         print()
         
         
         
-def get_product_origin_by_id(id: int, products_location) -> Tuple(int):
+def get_product_origin_by_id(id: str, products_location) -> Tuple[int]:
     already_found = False   
-    origin = ()
+    origin = [-1,-1]
     # for products_row in products_location:
     #     for product in products_row:
     #         if id in product:
@@ -33,7 +25,7 @@ def get_product_origin_by_id(id: int, products_location) -> Tuple(int):
         if already_found:
             break
         for j in range(0, len(products_location[i])):
-            if products_location[i][j] == id:
+            if id in products_location[i][j]:
                 origin[0] = j
                 origin[1] = i
                 already_found = True
@@ -68,6 +60,6 @@ def add_product_to_product_location(product_location: List[List[List[str | int]]
 
 def get_product(id:int, individual) -> Product_info:
     for product in individual.list_products:
-        if product.id == id:
+        if product["id"] == id:
             return product
     raise ValueError("product not found!")

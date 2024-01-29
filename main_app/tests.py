@@ -1,8 +1,10 @@
 import unittest
-from algorithm import *
+from algorithm import Individual, create_random_population, get_next_pos_one_side
+from utilty_individual import get_available_positions_for_product, is_enough_space
 from mockdata import *
 from utility import *
 import constants
+
 class TestEnoughSpaceCheck(unittest.TestCase):
     def test_is_enough_space(self):
         products = correct_list_products["products"]
@@ -40,7 +42,6 @@ class TestIndividual(unittest.TestCase):
         # print()
         # print('Before deleting product:')
         # print_products_location(individual)
-        get_available_origin_positions(individual, 2)
         delete_product_from_products_location(individual.products_location, "bbbb7cb9-e1e0-4ba1-a807-3f9b66ffd200")
         # print('After deleting product with id = bbbb7cb9-e1e0-4ba1-a807-3f9b66ffd200:')
         # print_products_location(individual)
@@ -105,8 +106,12 @@ class TestUtilityFunctions(unittest.TestCase):
 
         self.assertEqual(str(context.exception), constants.PRODUCT_TOO_BIG_FOR_STORAGE)
         
-
     
+
+class TestMutation(unittest.TestCase):
+    def test_get_next_pos_one_side(self):
+        pos = get_next_pos_one_side(1,3, 2, 4, 2, 3)
+        a = 1
     
 if __name__ == '__main__':
     unittest.main()
