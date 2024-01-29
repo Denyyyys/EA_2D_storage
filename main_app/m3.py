@@ -533,7 +533,7 @@ def run_simulation(
    
 		populations.append(curr_population)
   
-	return (populations, best_individual, best_individual_cost)
+	return (populations, best_individual, best_individual_cost, _ + 1)
 
 
 if __name__ == '__main__':
@@ -579,7 +579,7 @@ if __name__ == '__main__':
         "entry": [0,1]
     }
     
-    populations, best_individual, best_individual_cost = run_simulation(
+    populations, best_individual, best_individual_cost, number_iterations = run_simulation(
         cost_individual_func=get_cost,
         get_best_individual=get_best_individual, 
         get_init_population=create_random_population,
@@ -590,3 +590,4 @@ if __name__ == '__main__':
     # print(populations)
     print_products_location(best_individual)
     print(best_individual_cost)
+    print(f"number iterations: {number_iterations}")
