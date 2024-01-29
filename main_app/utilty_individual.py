@@ -106,7 +106,6 @@ def get_min_number_blocked_space(products_location: List[List[List[int]]]) -> in
 	while len(visited_space) != number_free_space:
 		temp = 0
 		not_visited_element = find_unique_element(visited_space, free_space_arr)
-
 		waiting_to_visit.append(not_visited_element)
 		while len(waiting_to_visit) > 0:
 			start_point = waiting_to_visit[0]

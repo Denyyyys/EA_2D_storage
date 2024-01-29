@@ -10,7 +10,7 @@ from custom_types import Product_info, Hyperparameters
 from utility import print_products_location, get_product_origin_by_id, \
 	delete_product_from_products_location, add_product_to_product_location, get_product
 
-from utilty_individual import is_enough_space, create_random_products_position, get_number_overlaps
+from utilty_individual import is_enough_space, create_random_products_position, get_number_overlaps, get_min_number_blocked_space
 
 ####################################
 ### Classes 	 				 ###
@@ -91,8 +91,8 @@ def mutation_by_one_side_diff_products(population: List[Individual], mutation_po
 		for available_position in available_positions:
 			if mutation_probability == 1 or rand_number < mutation_probability:
 				curr_x, curr_y = get_product_origin_by_id(available_position["id"], individual.products_location)
-				print('Before:')
-				print_products_location(individual)
+				# print('Before:')
+				# print_products_location(individual)
 				next_origin_pos = random.choice(get_next_pos_one_side(available_position["min_x_origin_pos"], available_position["max_x_origin_pos"],
                                      			 available_position["min_y_origin_pos"], available_position["max_y_origin_pos"], 
                                          		 curr_x, curr_y))
@@ -102,8 +102,8 @@ def mutation_by_one_side_diff_products(population: List[Individual], mutation_po
 				individual.products_location = delete_product_from_products_location(individual.products_location,available_position["id"])
 
 				individual.products_location = add_product_to_product_location(individual.products_location, product["width"], product["height"], product["id"],next_origin_pos[0], next_origin_pos[1])		
-				print('After:')
-				print_products_location(individual)
+				# print('After:')
+				# print_products_location(individual)
 				
 	return population
 
@@ -115,16 +115,16 @@ def mutation_by_one_side_product(population: List[Individual], mutation_power: i
 	for individual in population:
 		available_positions = individual.get_available_origin_positions(mutation_power)
 		number_products_to_mutate = min(number_products_to_mutate, len(available_positions))
-		print("individual")
-		print("------------------------------------------------")
+		# print("individual")
+		# print("------------------------------------------------")
 		indexes_arr = list(range(len(available_positions)))
 		random.shuffle(indexes_arr)
 		indexes_arr = indexes_arr[:number_products_to_mutate]
 		chosen_products = [available_positions[i] for i in indexes_arr]
 		for chosen_product in chosen_products:
 			curr_x, curr_y = get_product_origin_by_id(chosen_product["id"], individual.products_location)
-			print('Before:')
-			print_products_location(individual)
+			# print('Before:')
+			# print_products_location(individual)
 			next_origin_pos = random.choice(get_next_pos_one_side(chosen_product["min_x_origin_pos"], chosen_product["max_x_origin_pos"],
 												chosen_product["min_y_origin_pos"], chosen_product["max_y_origin_pos"], 
 												curr_x, curr_y))
@@ -134,8 +134,8 @@ def mutation_by_one_side_product(population: List[Individual], mutation_power: i
 			individual.products_location = delete_product_from_products_location(individual.products_location,chosen_product["id"])
 
 			individual.products_location = add_product_to_product_location(individual.products_location, product["width"], product["height"], product["id"],next_origin_pos[0], next_origin_pos[1])		
-			print('After:')
-			print_products_location(individual)
+			# print('After:')
+			# print_products_location(individual)
 
 	return population
 
@@ -186,8 +186,15 @@ def get_next_pos_two_sides(min_x, max_x, min_y, max_y, curr_x, curr_y):
 
 
 def tournament_selection(population: Population):
-	## BB
-	return population
+    next_population = []
+    for _ in range(len(population)):
+        individual_1 = random.choice(population)
+        individual_2 = random.choice(population)
+        if get_cost(individual_1) > get_cost(individual_2):
+            next_population.append(copy_individual(individual_2))
+        else:
+            next_population.append(copy_individual(individual_1))
+    return next_population
 
 
 def roulet_selection(population: Population):
@@ -200,6 +207,22 @@ def threshold_selection(population: Population):
 	return population
 
 
+def copy_individual(individual: Individual):
+	products_locations_copy = []
+	
+	for i in range(len(individual.products_location)):
+		temp_row = []
+		for j in range(len(individual.products_location[0])):
+			temp_arr = []
+			for element in individual.products_location[i][j]:
+				temp_arr.append(element)
+			temp_row.append(temp_arr)
+		products_locations_copy.append(temp_row)
+
+	individual_copy = Individual(individual.storage_width, individual.storage_height, individual.list_products,[individual.enter_position[0],individual.enter_position[1]])
+	
+	individual_copy.products_location = products_locations_copy    
+	return individual_copy
 
 ####################################
 ### Cost Functions		 	     ###
@@ -207,8 +230,23 @@ def threshold_selection(population: Population):
 
 
 def get_best_individual(population: Population) -> Individual:
-    sorted_pop = sort_population(population)
-    return sorted_pop[0]
+	sorted_pop = sort_population(population)
+	best_ind = sorted_pop[0]
+	best_ind_list_products = best_ind.products_location
+	products_locations_copy = []
+	
+	for i in range(len(best_ind_list_products)):
+		temp_row = []
+		for j in range(len(best_ind_list_products[0])):
+			temp_arr = []
+			for element in best_ind_list_products[i][j]:
+				temp_arr.append(element)
+			temp_row.append(temp_arr)
+		products_locations_copy.append(temp_row)
+
+	best_ind_copy = Individual(best_ind.storage_width, best_ind.storage_height, best_ind.list_products,[best_ind.enter_position[0],best_ind.enter_position[1]])
+	best_ind_copy.products_location = products_locations_copy
+	return best_ind_copy
 
 
 def sort_population(population: Population):
@@ -222,6 +260,9 @@ def get_cost(individual: Individual) -> float:
 
 
 def get_punishment(individual: Individual) -> float:
+	overlap = get_punishment_overlap(individual)
+	cannot_enter = get_punishment_cannot_enter(individual)
+	blocked_free_space = get_punishment_blocked_free_space(individual)
 	punishment = get_punishment_overlap(individual) + get_punishment_cannot_enter(individual) + \
      get_punishment_blocked_free_space(individual) + get_punishment_blocked_products(individual)
 	return punishment
@@ -233,19 +274,18 @@ def get_punishment_overlap(individual: Individual, cost = 400) -> float:
 
 
 def get_punishment_cannot_enter(individual: Individual, cost = 400) -> float:
-    
 	if len(individual.products_location[individual.enter_position[1]][individual.enter_position[0]]) > 1:
 		return cost
 	return 0
 
 
 def get_punishment_blocked_free_space(individual: Individual, cost = 400) -> float:
-	
-	return 0
+	total_blocked_space = get_min_number_blocked_space(individual.products_location)
+	return cost * total_blocked_space
 
 
 def get_punishment_blocked_products(individual: Individual, cost_per_frame = 100) -> float:
-	## DF
+	
 	return 0
 
 
@@ -277,24 +317,25 @@ def run_simulation(
 		mutation_parameter = hyperparameters["mutation_probability"]
 	populations: List[Population] = []
 	init_population = get_init_population(number_individuals, storage_width, storage_height, products, entry)
-	print('init population:')
-	for i in init_population:
-		print_products_location(i)
-		print('----------------------')
+	# print('init population:')
+	# for i in init_population:
+	# 	print_products_location(i)
+	# 	print('----------------------')
 	populations.append(init_population)
 	best_individual = get_best_individual(init_population)
 	best_individual_cost = cost_individual_func(best_individual)
  
 	if best_individual_cost == 0:
 		return (populations, best_individual, best_individual_cost)
-
+	number_iterations = 0
 	curr_population = init_population
 	for _ in range(max_iterations):
+		number_iterations += 1
 		curr_population = selection_func(curr_population)
 		curr_population = mutation_func(curr_population, mutation_power, mutation_parameter)
 		curr_best_individual = get_best_individual(curr_population)
 		curr_best_individual_cost = cost_individual_func(curr_best_individual)
-
+		# print(curr_best_individual_cost)
 		if curr_best_individual_cost < best_individual_cost:
 			best_individual = curr_best_individual
 			best_individual_cost = curr_best_individual_cost
@@ -303,11 +344,13 @@ def run_simulation(
 
 		if succession_func is not None:
 			curr_population = succession_func(curr_population)
-		print(f"population: {_}")
-		for i in curr_population:
-			print_products_location(i)
-			print('----------------------')
-   
+		# print(f"population: {_}")
+		# for i in curr_population:
+		# 	print_products_location(i)
+		# 	print('----------------------')
+		
 		populations.append(curr_population)
   
-	return (populations, best_individual, best_individual_cost)
+	return (populations, best_individual, best_individual_cost, number_iterations)
+
+

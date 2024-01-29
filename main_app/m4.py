@@ -574,6 +574,9 @@ if __name__ == '__main__':
         "products":[
             {"width": 2, "height": 1, "id": "a"},
             {"width": 2, "height": 2, "id": "b"},
+            {"width": 2, "height": 2, "id": "bb"},
+            {"width": 2, "height": 2, "id": "bc"},
+            {"width": 2, "height": 2, "id": "bd"},
             {"width": 1, "height": 1, "id": "c"},
             {"width": 1, "height": 1, "id": "d"},
             {"width": 1, "height": 1, "id": "e"},
@@ -581,14 +584,14 @@ if __name__ == '__main__':
             {"width": 1, "height": 1, "id": "g"},
             {"width": 1, "height": 1, "id": "h"},
         ],
-        "storage_width": 3,
+        "storage_width": 10,
         "storage_height": 5
     }
     products, storage_width, storage_height = correct_list_products["products"], correct_list_products["storage_width"], correct_list_products["storage_height"]
     hyperparameters = {
         "mutation_probability": 2,
         "mutation_power": 5,
-        "number_individuals": 10,
+        "number_individuals": 100,
         "max_iterations": 100,
         "storage_width": storage_width,
         "storage_height": storage_height,
