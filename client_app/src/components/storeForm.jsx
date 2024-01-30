@@ -1,6 +1,6 @@
 
 import { useDispatch, useSelector } from 'react-redux';
-import { setStoreWidth, setStoreHeight, setBestIndividual, setBestIndividualCost, setNumberNeededIterations } from '../slices/storeSizeSlice'
+import { setStoreWidth, setStoreHeight, setBestIndividual, setBestIndividualCost, setNumberNeededIterations, setMaxIterations, setNumberIndividuals, setMutationPower, setMutationProbability, setNumberProductsToMutate } from '../slices/storeSizeSlice'
 import { addProduct } from '../slices/productsSlice'
 import { isRectangle, getRectangleSize, createEmptyArray } from '../utils/utils'
 import { useState } from 'react';
@@ -189,6 +189,27 @@ function StoreForm() {
 			<button disabled={isButtonDisabled} className="submit-product-btn btn btn-success" onClick={submitProductHandler} >Submit Product</button>
 
 			<button className="submit-product-btn btn btn-success" onClick={submitResultHandler}>Get Result!</button>
+
+			<div class="form-group">
+				<label for="max_iteration_dom">Maximum Iterations</label>
+				<input type="number" value={max_iterations} class="form-control" id="max_iteration_dom" onChange={(e) => {
+					dispatch(setMaxIterations(e.target.value));
+				}} />
+				<label for="number_individuals_dom">Number Of Individuals</label>
+				<input type="number" value={number_individuals} class="form-control" id="number_individuals_dom" onChange={(e) => {
+					dispatch(setNumberIndividuals(e.target.value));
+				}} />
+				<label for="mutation_power_dom">Mutation Power</label>
+				<input type="number" value={mutation_power} class="form-control" id="mutation_power_dom" onChange={(e) => {
+					dispatch(setMutationPower(e.target.value));
+				}} />
+
+				<label for="number_products_to_mutate_dom">Number Of Products To Mutate</label>
+				<input type="number" value={number_products_to_mutate} class="form-control" id="number_products_to_mutate_dom" onChange={(e) => {
+					dispatch(setNumberProductsToMutate(e.target.value));
+				}} />
+			</div>
+
 		</form>
 
 	)

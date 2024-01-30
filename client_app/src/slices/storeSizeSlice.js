@@ -5,8 +5,8 @@ const storeSizeSlice = createSlice({
 	initialState: {
 		storeWidth: 4,
 		storeHeight: 3,
-		max_iterations: 1,
-		number_individuals: 2,
+		max_iterations: 100,
+		number_individuals: 20,
 		mutation_power: 2,
 		mutation_probability: 0.5,
 		number_products_to_mutate: 2,
