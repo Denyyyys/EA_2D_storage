@@ -4,7 +4,8 @@ import { v4 as uuidv4 } from 'uuid';
 const productsSlice = createSlice({
 	name: 'products',
 	initialState: {
-		products: []
+		products: [],
+		entry: [0,0]
 	},
 	reducers: {
 		addProduct: (state, action) =>{
@@ -28,9 +29,12 @@ const productsSlice = createSlice({
 				state = state.products.filter(product => product.id !== id);
 			}
 		},
-
+		setEntry: (state, action) => {
+			if (action.payload !== "")
+				state.entry = parseInt(action.payload);
+		},
 	},
 });
 
-export const { addProduct, removeProduct } = productsSlice.actions;
+export const { addProduct, removeProduct, setEntry } = productsSlice.actions;
 export default productsSlice.reducer;

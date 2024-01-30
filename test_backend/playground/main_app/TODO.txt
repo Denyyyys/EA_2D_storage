@@ -1,0 +1,2 @@
+1. str method in individual
+2. population creation different

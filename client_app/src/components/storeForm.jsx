@@ -1,6 +1,6 @@
 
 import { useDispatch, useSelector } from 'react-redux';
-import { setStoreWidth, setStoreHeight } from '../slices/storeSizeSlice'
+import { setStoreWidth, setStoreHeight, setBestIndividual, setBestIndividualCost, setNumberNeededIterations } from '../slices/storeSizeSlice'
 import { addProduct } from '../slices/productsSlice'
 import { isRectangle, getRectangleSize, createEmptyArray } from '../utils/utils'
 import { useState } from 'react';
@@ -9,11 +9,79 @@ import React, { useRef, useEffect } from 'react';
 
 function StoreForm() {
 	const dispatch = useDispatch();
-	const { storeWidth, storeHeight } = useSelector(state => state.storeSize)
+	const { storeWidth, storeHeight, max_iterations, number_individuals, mutation_power, number_products_to_mutate, mutation_probability } = useSelector(state => state.storeSize)
+	const { products, entry } = useSelector(state => state.products)
 	const [selectedFile, setSelectedFile] = useState(null);
+	const [isLoading, setIsLoading] = useState(false);
+	const [err, setErr] = useState('');
+	const [data, setData] = useState({})
+	console.log(Object.keys(data).length === 0 && data.constructor === Object);
 	const handleFileChange = (event) => {
 		const file = event.target.files[0];
 		setSelectedFile(file);
+	}
+	const submitResultHandler = async (event) => {
+		event.preventDefault();
+		toast.clearWaitingQueue();
+		setIsLoading(true);
+		console.log(123432);
+
+		toast.dismiss();
+		let total_space = 0
+		products.forEach(product => {
+			total_space += product.width * product.height
+		})
+		if (total_space >= storeHeight * storeWidth) {
+			toast.error('Your products require more space, than you have!', { position: toast.POSITION.TOP_CENTER, autoClose: 2000, closeOnClick: true });
+			return
+		}
+		toast.success('Your order was sent!', { position: toast.POSITION.TOP_CENTER, autoClose: 2000, closeOnClick: true });
+		try {
+			let data = [0, 1] //& data=${ JSON.stringify(data) }
+			const url_string = `http://127.0.0.1:9000/playground/hello/?id=10232r&data=${JSON.stringify(data)}` +
+				`&storage_width=${storeWidth}&storage_height=${storeHeight}&max_iterations=${max_iterations}&number_individuals=${number_individuals}` +
+				`&mutation_power=${mutation_power}&number_products_to_mutate=${number_products_to_mutate}&mutation_probability=${mutation_probability}` +
+				`&products=${JSON.stringify(products)}&entry=${JSON.stringify(entry)}`
+
+			const response = await fetch(url_string, {
+				method: 'GET',
+				headers: {
+					Accept: 'application/json',
+				},
+				mode: 'cors'
+			});
+			console.log(response);
+			if (!response.ok) {
+				throw new Error(`Error! status: ${response.status}`);
+			}
+
+			const result = await response.json();
+
+			console.log('result is: ', JSON.stringify(result, null, 4));
+			console.log(result.best_individual);
+			dispatch(setBestIndividualCost(result.best_individual_cost))
+			dispatch(setNumberNeededIterations(result.number_iterations))
+			dispatch(setBestIndividual(result.best_individual))
+			console.log(result.number_iterations);
+			console.log(result.best_individual);
+			setData(result);
+			// const data = {
+			// 	key1: 'value1',
+			// 	key2: 'value2'
+			// };
+			// fetch('http://127.0.0.1:9000/playground/hello/', {
+			// 	method: 'POST',
+			// 	headers: {
+			// 		'Content-Type': 'application/json',
+			// 	},
+			// 	body: JSON.stringify(data),
+			// });
+		} catch (err) {
+			console.log(err);
+			setErr(err.message);
+		} finally {
+			setIsLoading(false);
+		}
 	}
 	// const { products, currentProduct } = useSelector(state => state.products)
 
@@ -119,12 +187,10 @@ function StoreForm() {
 				{paragraphs}
 			</div>
 			<button disabled={isButtonDisabled} className="submit-product-btn btn btn-success" onClick={submitProductHandler} >Submit Product</button>
-			<label htmlFor="fileInput">Choose a file</label>
-			<input
-				type="file"
-				id="fileInput"
-				onChange={handleFileChange}
-			/>		</form>
+
+			<button className="submit-product-btn btn btn-success" onClick={submitResultHandler}>Get Result!</button>
+		</form>
+
 	)
 }
 export default StoreForm;
