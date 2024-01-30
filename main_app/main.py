@@ -51,7 +51,7 @@ if __name__ == '__main__':
         mutation_func=mutation_by_one_side_product, 
         hyperparameters=hyperparameters
     )
-    # print(populations)
+    print("Best individual products location:")
     print_products_location(best_individual)
-    print(best_individual_cost)
+    print(f"best individual cost: {best_individual_cost}")
     print(f"number iterations: {number_iterations}")
