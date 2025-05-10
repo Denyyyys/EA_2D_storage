@@ -4,8 +4,8 @@ This project uses an evolutionary algorithm to optimize the placement of rectang
 
 ## Structure
 
-- The core logic of the evolutionary algorithm is located in the main_app folder.
+- The core logic of the evolutionary algorithm is located in the `main_app` folder.
 
-- The client_app folder contains a React-based user interface for creating items of various shapes and configuring store dimensions.
+- The `client_app` folder contains a React-based user interface for creating items of various shapes and configuring store dimensions.
 
 More details can be found in `POP-projekt-wstępny.pdf`.
